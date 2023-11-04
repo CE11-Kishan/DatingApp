@@ -47,6 +47,8 @@ export class MemberListComponent implements OnInit {
             this.userParams = this.memberService.resetUesrParams();
             this.loadMembers();
       }
+
+
       pageChanged(event: any) {
             if (this.userParams && this.userParams?.pageNumber !== event.page) {
                   this.userParams.pageNumber = event.page;
@@ -54,6 +56,4 @@ export class MemberListComponent implements OnInit {
                   this.loadMembers();
             }
       }
-
-
 }
