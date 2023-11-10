@@ -20,24 +20,21 @@ if (builder.Environment.IsDevelopment())
       connString = builder.Configuration.GetConnectionString("DefaultConnection");
 else
 {
-      // Use connection string provided at runtime by Heroku.
-      var postgresUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+      // Use connection string provided at runtime by render.
+      var connUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
       // Parse connection URL to connection string for Npgsql
-      Uri uri = new Uri(postgresUrl);
+      connUrl = connUrl.Replace("postgres://", string.Empty);
+      var pgUserPass = connUrl.Split("@")[0];
+      var pgHostPortDb = connUrl.Split("@")[1];
+      var pgHostPort = pgHostPortDb.Split("/")[0];
+      var pgDb = pgHostPortDb.Split("/")[1];
+      var pgUser = pgUserPass.Split(":")[0];
+      var pgPass = pgUserPass.Split(":")[1];
+      var pgHost = pgHostPort.Split(":")[0];
+      var pgPort = pgHostPort.Split(":")[1];
 
-        string[] userInfo = uri.UserInfo.Split(':');
-        string username = Uri.UnescapeDataString(userInfo[0]);
-        string password = Uri.UnescapeDataString(userInfo[1]);
-
-        string host = uri.Host;
-        int port = uri.Port == -1 ? 5432 : uri.Port;
-
-        string[] pathSegments = uri.Segments;
-        string database = pathSegments[pathSegments.Length - 1].Trim('/');
-
-        // Construct the connection string
-        connString = $"Host={host};Port={port};Username={username};Password={password};Database={database};";
+      connString = $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb};";
 
 }
 builder.Services.AddDbContext<DataContext>(opt =>
