@@ -49,7 +49,8 @@ namespace API.Controllers
             [HttpGet("{username}")]
             public async Task<ActionResult<MemberDto>> GetUser(string username)
             {
-                  return await _uow.UserRepository.GetMemberAsync(username);
+                  var currentUsername = User.GetUserName();
+                  return await _uow.UserRepository.GetMemberAsync(username, isCurrentUser: currentUsername == username);
             }
 
             [HttpPut]
@@ -70,37 +71,28 @@ namespace API.Controllers
             public async Task<ActionResult<PhotoDto>> AddPhoto(IFormFile file)
             {
                   var user = await _uow.UserRepository.GetUserByUsernameAsync(User.GetUserName());
-
-                  if (user == null) return NotFound();
-
                   var result = await _photoService.AddPhotoAsync(file);
 
                   if (result.Error != null) return BadRequest(result.Error.Message);
-
+                  
                   var photo = new Photo
                   {
                         Url = result.SecureUrl.AbsoluteUri,
                         PublicId = result.PublicId
                   };
 
-                  if (user.Photos.Count == 0) photo.IsMain = true;
-
                   user.Photos.Add(photo);
 
                   if (await _uow.Complete())
                   {
-                        return CreatedAtAction(
-                              nameof(GetUser),
-                              new { username = user.UserName },
-                              _mapper.Map<PhotoDto>(photo)
-
-                        );
+                        return CreatedAtRoute("GetUser", new
+                        {
+                              username =
+                       user.UserName
+                        }, _mapper.Map<PhotoDto>(photo));
                   }
 
-                  return BadRequest("Problem adding photo");
-
-
-
+                  return BadRequest("Problem addding photo");
             }
 
             [HttpPut("set-main-photo/{photoId}")]
@@ -134,7 +126,7 @@ namespace API.Controllers
             {
                   var user = await _uow.UserRepository.GetUserByUsernameAsync(User.GetUserName());
 
-                  var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
+                  var photo = await _uow.PhotoRepository.GetPhotoById(photoId);
 
                   if (photo == null) return NotFound();
 

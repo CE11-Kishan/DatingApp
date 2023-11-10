@@ -15,10 +15,6 @@ namespace API.Extensions
             {
                   services.AddEndpointsApiExplorer();
                   services.AddSwaggerGen();
-                  services.AddDbContext<DataContext>(opt =>
-                  {
-                        opt.UseSqlite(config.GetConnectionString("DefaultConnection"));
-                  });
                   services.AddCors();
                   services.AddScoped<ITokenService, TokenService>();
                   services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
