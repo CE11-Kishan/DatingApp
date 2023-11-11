@@ -2,9 +2,12 @@ name: docker-push
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches:
-  #     - 'main'
+  push:
+    branches:
+      - 'main'
+      
+env:
+  RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
 
 jobs:
   docker:
@@ -26,3 +29,14 @@ jobs:
           context: "{{defaultContext}}:API"
           push: true
           tags: remixkg6/datingapp:latest
+
+  deploy:
+        needs: docker
+        name: Deploy App
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v3
+          
+        run: |
+          curl -X POST ${{ secrets.DEPLOY_HOOK_URL }}
+        
