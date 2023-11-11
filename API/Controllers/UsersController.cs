@@ -74,7 +74,7 @@ namespace API.Controllers
                   var result = await _photoService.AddPhotoAsync(file);
 
                   if (result.Error != null) return BadRequest(result.Error.Message);
-                  
+
                   var photo = new Photo
                   {
                         Url = result.SecureUrl.AbsoluteUri,
@@ -85,11 +85,11 @@ namespace API.Controllers
 
                   if (await _uow.Complete())
                   {
-                        return CreatedAtRoute("GetUser", new
-                        {
-                              username =
-                       user.UserName
-                        }, _mapper.Map<PhotoDto>(photo));
+                        return CreatedAtAction(
+                              nameof(GetUser), 
+                              new { username = user.UserName }, 
+                              _mapper.Map<PhotoDto>(photo)
+                        );
                   }
 
                   return BadRequest("Problem addding photo");
