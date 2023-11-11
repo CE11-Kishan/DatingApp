@@ -26,7 +26,7 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: "${{ github.workspace }}:API"  # Use double curly braces here
+          context: "{{defaultContext}}:API"  
           push: true
           tags: remixkg6/datingapp:latest
 
