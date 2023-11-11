@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - 'main'
-      
+
 env:
   RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
 
@@ -26,17 +26,19 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: "{{defaultContext}}:API"
+          context: "${{ github.workspace }}:API"  # Use double curly braces here
           push: true
           tags: remixkg6/datingapp:latest
 
   deploy:
-        needs: docker
-        name: Deploy App
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v3
-          
+    needs: docker
+    name: Deploy App
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout code
+        uses: actions/checkout@v3
+      -
+        name: Deploy using the Render API
         run: |
-          curl -X POST ${{ secrets.DEPLOY_HOOK_URL }}
-        
+          curl -X POST "${{ secrets.DEPLOY_HOOK_URL }}"  # Use double curly braces here
