@@ -6,33 +6,37 @@
                   aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="navbar-collapse collapse" id="navbarCollapse" >
+            <div class="navbar-collapse collapse" id="navbarCollapse">
                   <div class="container">
-                        <ul  class="navbar-nav me-auto mb-2 mb-md-0">
+                        <ul class="navbar-nav me-auto mb-2 mb-md-0">
                               <ng-container *ngIf="accountServices.currentUser$ | async">
                                     <li class="nav-item">
-                                          <a class="nav-link" [routerLinkActiveOptions]="{exact: true}" routerLink="/members" routerLinkActive="active">Matches</a>
+                                          <a class="nav-link" [routerLinkActiveOptions]="{exact: true}"
+                                                routerLink="/members" routerLinkActive="active">Matches</a>
                                     </li>
                                     <li class="nav-item">
                                           <a class="nav-link" routerLink="/lists" routerLinkActive="active">Lists</a>
                                     </li>
                                     <li class="nav-item">
-                                          <a class="nav-link" routerLink="/messages" routerLinkActive="active">Messages</a>
+                                          <a class="nav-link" routerLink="/messages"
+                                                routerLinkActive="active">Messages</a>
                                     </li>
                                     <li *appHasRole="['Admin', 'Moderator']" class="nav-item">
                                           <a class="nav-link" routerLink="/admin" routerLinkActive="active">Admin</a>
                                     </li>
+                                    <li class="nav-item" *appHasRole="['Admin']">
+                                          <a class="nav-link" routerLink="/errors" routerLinkActive="active">Errors</a>
+                                    </li>
                               </ng-container>
-                              <li class="nav-item" *appHasRole="['Admin']" >
-                                    <a class="nav-link" routerLink="/errors" routerLinkActive="active">Errors</a>
-                              </li>
-                         
+
+
                         </ul>
                   </div>
 
                   <div class="dropdown" *ngIf="(accountServices.currentUser$ | async) as user" dropdown>
                         <img src="{{ user.photoUrl || './assets/user.png'}}" alt="user photo">
-                        <a class="dropdown-toggle text-light text-decoration-none ms-2" dropdownToggle>Welcome {{ user.knownAs }}</a>
+                        <a class="dropdown-toggle text-light text-decoration-none ms-2" dropdownToggle>Welcome {{
+                              user.knownAs }}</a>
                         <div class="dropdown-menu mt-3" *dropdownMenu>
                               <a class="dropdown-item" routerLink="/member/edit">Edit Profile</a>
                               <a class="dropdown-item" (click)="logout()">Logout</a>
@@ -40,7 +44,8 @@
                   </div>
 
 
-                  <form *ngIf="!(accountServices.currentUser$ | async)" #loginForm="ngForm" class="d-flex" (ngSubmit)="login()" autocomplete="off">
+                  <form *ngIf="!(accountServices.currentUser$ | async)" #loginForm="ngForm" class="d-flex"
+                        (ngSubmit)="login()" autocomplete="off">
                         <input name="username" [(ngModel)]="model.username" class="form-control me-2" type="text"
                               placeholder="Username">
                         <input name="password" [(ngModel)]="model.password" class="form-control me-2" type="password"

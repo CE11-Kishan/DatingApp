@@ -3,7 +3,6 @@ using API.Entities;
 using API.Extensions;
 using API.Middleware;
 using API.SignalR;
-using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,7 +19,7 @@ if (builder.Environment.IsDevelopment())
       connString = builder.Configuration.GetConnectionString("DefaultConnection");
 else
 {
-      // Use connection string provided at runtime by fly.
+      // Use connection string provided at runtime by render.
       var connUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
       // Parse the PostgreSQL URL
