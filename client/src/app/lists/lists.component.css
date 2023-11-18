@@ -1,0 +1,4 @@
+.col-2-custom{
+      flex-grow: 1 !important;
+      max-width: 200px;
+}

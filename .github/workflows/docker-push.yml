@@ -1,10 +1,10 @@
 name: docker-push
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - 'main'
+  # workflow_dispatch:
+  # push:
+  #   branches:
+  #     - 'main'
 
 env:
   RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}

@@ -12,11 +12,15 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class NavComponent implements OnInit {
       model: any = {};
+      isNavbarOpen = false;
 
       constructor(public accountServices: AccountService, private router: Router, private tostr: ToastrService) { }
 
       ngOnInit(): void {
       }
+      toggleNavbar() {
+            this.isNavbarOpen = !this.isNavbarOpen;
+          }
 
       login() {
             this.accountServices.login(this.model).subscribe({
@@ -31,4 +35,5 @@ export class NavComponent implements OnInit {
             this.router.navigateByUrl('/')
 
       }
+      
 }

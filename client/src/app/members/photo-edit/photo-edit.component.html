@@ -1,5 +1,5 @@
 <div class="row mb-3" *ngIf="member">
-      <div class="col-2 mb-1 img-wrapper" *ngFor="let photo of member.photos">
+      <div class="col-2-custom mb-1 img-wrapper" *ngFor="let photo of member.photos">
             <img src="{{ photo.url }}" alt="photo of user" class="img-thumbnail p-1" [class.not-approved]="!photo.isApproved">
             <div class="text-center img-text" *ngIf="!photo.isApproved" >
                   <span class="text-danger">Awaiting approval</span>
@@ -18,7 +18,7 @@
 </div>
 <div class="row">
 
-      <div class="col-3">
+      <div class="col-12">
 
             <h3>Add Photos</h3>
 
@@ -29,13 +29,17 @@
             </div>
 
             Multiple
-            <input type="file" ng2FileSelect [uploader]="uploader" multiple /><br />
+            <input type="file" ng2FileSelect [uploader]="uploader" multiple /> 
+            <br>
+            <br>
 
             Single
             <input type="file" ng2FileSelect [uploader]="uploader" />
+            <br>
+            <br>
       </div>
 
-      <div class="col-9" *ngIf="uploader?.queue?.length" style="margin-bottom: 40px">
+      <div class="col-12" *ngIf="uploader?.queue?.length" style="margin-bottom: 40px">
 
             <h3>Upload queue</h3>
             <p>Queue length: {{ uploader?.queue?.length }}</p>

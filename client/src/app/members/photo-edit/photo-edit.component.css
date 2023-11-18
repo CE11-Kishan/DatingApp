@@ -22,3 +22,8 @@ input[type=file] {
       margin-right: auto;
       bottom: 30%;
 }
+
+.col-2-custom{
+      flex-grow: 1 !important;
+      max-width: 150px;
+}

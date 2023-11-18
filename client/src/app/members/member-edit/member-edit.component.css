@@ -1,10 +1,9 @@
 .img-thumbnail{
-      margin: 25px;
+      margin: 5px auto;
       width: 85%;
-      height: 855;
 }
 .card-body{
-      padding: 0 25px;
+      margin: 0 auto;
 }
 
 .card-footer{
