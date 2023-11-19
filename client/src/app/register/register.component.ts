@@ -17,7 +17,7 @@ export class RegisterComponent implements OnInit {
 
       constructor(private accountService: AccountService, private tostr: ToastrService, private fb: FormBuilder, private router: Router) { }
 
-      ngOnInit(): void {
+      ngOnInit(){
             this.initializeForm();
             this.maxDate.setFullYear(this.maxDate.getFullYear()-18);
       }
@@ -45,7 +45,6 @@ export class RegisterComponent implements OnInit {
       }
 
       register() {
-            //console.log(this.registerForm?.value);
             const dob = this.getDateOnly(this.registerForm.controls['dateOfBirth'].value);
             const values = {...this.registerForm.value,dateOfBirth: dob};
             this.accountService.register(values).subscribe({

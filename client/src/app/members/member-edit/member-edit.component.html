@@ -7,7 +7,7 @@
                   <p><strong>Information:</strong>You have made changes. Any unsaved changes will be lost</p>
             </div>
       </div>
-      <div class="col-4">
+      <div class="col-md-4">
             <div class="card">
                   <img class="card-img-top img-thumbnail" src="{{ member.photoUrl || './assets/user.png' }}"
                         alt="{{ member.knownAs }}">
@@ -35,7 +35,7 @@
                   </div>
             </div>
       </div>
-      <div class="col-8">
+      <div class="col-md-8">
             <tabset class="member-tabset">
                   <tab heading="About {{ member.knownAs }}">
                         <form id="editForm" #editForm="ngForm" (ngSubmit)="updateMember()">

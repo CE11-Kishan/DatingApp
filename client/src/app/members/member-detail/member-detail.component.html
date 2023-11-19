@@ -1,5 +1,5 @@
 <div class="row">
-      <div class="col-4">
+      <div class="col-md-4">
             <div class="card">
                   <img class="card-img-top img-thumbnail" src="{{ member.photoUrl || './assets/user.png' }}"
                         alt="{{ member.knownAs }}">
@@ -32,10 +32,11 @@
                   </div>
             </div>
       </div>
-      <div class="col-8">
-            <tabset class="member-tabset" #memberTabs>
-                  <tab heading="About {{ member.knownAs }}" (selectTab)="onTabActivated($event)">
+      <div class="col-md-8">
+            <tabset [justified]="true" class="member-tabset" #memberTabs>
+                  <tab  heading="About" (selectTab)="onTabActivated($event)">
                         <h4>Description</h4>
+                        <h6>{{ member.knownAs }}</h6>
                         <p>{{ member.introduction }}</p>
                         <h4>Looking for</h4>
                         <p>{{ member.lookingFor }}</p>

@@ -1,4 +1,9 @@
+.row{
+      justify-content: space-evenly;
+}
+
 .col-2-custom{
-      flex-grow: 1 !important;
-      max-width: 200px;
+      flex-grow: 1 !important; 
+      min-width: 120px;
+      max-width: 175px;
 }

@@ -6,26 +6,30 @@
       <form #form="ngForm" class="mb-3" (ngSubmit)="loadMembers()" autocomplete="off">
             <div class="col mb-2">
 
-                  <label class="mr-2">Age from: 
-                  <input type="number" class="form-control" style="width: 70px;" name="minAge"
-                        [(ngModel)]="userParams.minAge">
-                  </label>
+                  <span class="d-flex">
+                        <label class="mr-2">Age from:
+                              <input type="number" class="form-control" style="width: 25vw;" name="minAge"
+                                    [(ngModel)]="userParams.minAge">
+                        </label>
 
-                  <label class="mx-2">Age to: 
-                  <input type="number" class="form-control" style="width: 70px;" name="maxAge"
-                        [(ngModel)]="userParams.maxAge">
-                  </label>
-                  <label class="mx-2 mb-2">Show: 
-                  <select name="gender" style="width: 150px;" class="form-select" [(ngModel)]="userParams.gender">
-                        <option *ngFor="let gender of genderList" [value]="gender.value">
-                              {{gender.display}}
-                        </option>
-                  </select>
-            </label>
+                        <label class="mx-2">Age to:
+                              <input type="number" class="form-control" style="width: 25vw;" name="maxAge"
+                                    [(ngModel)]="userParams.maxAge">
+                        </label>
+                        <label class="mx-2 mb-2">Show:
+                              <select name="gender" style="width: 25vw;" class="form-select"
+                                    [(ngModel)]="userParams.gender">
+                                    <option *ngFor="let gender of genderList" [value]="gender.value">
+                                          {{gender.display}}
+                                    </option>
+                              </select>
+                        </label>
+                  </span>
 
-
-                  <button type="submit" class="btn btn-primary ms-1">Apply Filters</button>
-                  <button (click)="resetFilters()" type="submit" class="btn btn-info ms-1">Reset Filters</button>
+                  <span class="d-flex">
+                        <button type="submit" class="btn btn-primary ms-1">Apply Filters</button>
+                        <button (click)="resetFilters()" type="submit" class="btn btn-info ms-1">Reset Filters</button>
+                  </span>
             </div>
 
             <div class="col">
