@@ -42,3 +42,7 @@
       animation: fa-blink 1.5s linear infinte;
       color: rgb(1,189,42);
 }
+
+.card-icon-btn{
+      padding:6px 12px;
+}
