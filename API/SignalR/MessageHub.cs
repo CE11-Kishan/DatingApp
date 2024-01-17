@@ -125,8 +125,5 @@ namespace API.SignalR
                   throw new HubException("Failed to remove from group");
             }
 
-
-
-
       }
 }

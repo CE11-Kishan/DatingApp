@@ -24,6 +24,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
       activeTab?: TabDirective;
       messages: Message[] = [];
       user?: User;
+      peerShareId: string[] = [];
 
       constructor(private accountService: AccountService, private route: ActivatedRoute, private messageService: MessageService, public presenceService: PresenceService, private router: Router) { 
             this.accountService.currentUser$.pipe(take(1)).subscribe({
@@ -61,6 +62,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
 
             ];
             this.galleryImages = this.getImages();
+            this.loadUserPeerId();
 
       }
 
@@ -82,6 +84,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
                   this.memberTabs.tabs.find(tab => tab.heading === heading)!.active = true;
             }
       }
+      
 
       loadMessages(){
             if(this.member?.userName){
@@ -97,6 +100,14 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
                   this.messageService.createHubConnection(this.user, this.member.userName);
             }else{
                   this.messageService.stopHubConnection();
+            }
+      }
+      
+      loadUserPeerId(){ 
+            if (this.member.userName) {
+                  this.presenceService.getPeerId(this.member.userName)?.then( peerIdList => {
+                        this.peerShareId = peerIdList;
+                  })
             }
       }
 
