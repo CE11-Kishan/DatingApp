@@ -1,0 +1,38 @@
+.video-screen{
+      height: 60vh;
+      display: flex;
+      flex-direction: row;
+}
+
+.call-controls{
+      display: flex;
+      justify-content: space-evenly;
+      margin-top: 10px;
+}
+
+.caller, .receiver {
+      display: flex;
+      flex: 1;
+      height: 100%;
+      width: 50%;
+      border: 2px solid black;
+      justify-content: center;
+      align-items: center;
+}
+
+video{
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+}
+
+@media only screen and (max-width: 800px) {
+      .video-screen{
+            height: 90vh;
+            flex-direction: column;
+      }
+      .caller, .receiver {
+            width: 100%;
+            height: 50%;
+      }
+}
