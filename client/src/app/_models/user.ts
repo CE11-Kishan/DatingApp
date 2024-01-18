@@ -5,5 +5,4 @@ export interface User{
       knownAs: string;
       gender: string;
       roles: string[];
-      peerId?: string;
 }

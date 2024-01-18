@@ -19,9 +19,6 @@ export class MemberMessagesComponent implements OnInit {
 
   ngOnInit(): void {
   }
-  ngOnDestroy(): void {
-      this.messageService.stopHubConnection();
-}
 
   sendMessage(){
       if(!this.username) return;
@@ -30,5 +27,6 @@ export class MemberMessagesComponent implements OnInit {
             this.messageForm?.reset();
       }).finally(() => this.loading = false);
   }
+
 
 }

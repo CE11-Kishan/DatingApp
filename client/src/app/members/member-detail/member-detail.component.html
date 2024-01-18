@@ -51,9 +51,6 @@
                   <tab heading="Messages" (selectTab)="onTabActivated($event)">
                         <app-member-messages [username]="member.userName"></app-member-messages>
                   </tab>
-                  <tab heading="VideoCall" (selectTab)="onTabActivated($event)">
-                        <app-member-video-call [peerIdShare]="peerShareId" [username]="member.userName"></app-member-video-call>
-                  </tab>
             </tabset>
       </div>
 
