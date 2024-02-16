@@ -15,17 +15,12 @@ export class PresenceService {
       private hubConnection?: HubConnection;
       private onlineUserSource = new BehaviorSubject<string[]>([]);
       onlineUsers$ = this.onlineUserSource.asObservable();
-      public peer: Peer = new Peer();
-      peerId: any;
-
 
       constructor(private toastr: ToastrService, private router: Router) {}
 
       createHubConnection(user: User) {
-            this.peer.on('open', (id) => {
-                  this.peerId = id;
                   this.hubConnection = new HubConnectionBuilder()
-                        .withUrl(`${this.hubUrl}presence?peerId=${this.peerId}`, {
+                        .withUrl(`${this.hubUrl}presence`, {
                               accessTokenFactory: () => user.token,
                         })
                         .withAutomaticReconnect()
@@ -59,19 +54,13 @@ export class PresenceService {
                   })
 
                   this.hubConnection.on('AcceptVideoCall', ({ username, knownAs }) => {
-                        this.toastr.info(knownAs + ' want to connect on video call! Click me to see it')
+                        this.toastr.info(knownAs + ' want to connect on video call! Click me to see it',"Calling" ,{disableTimeOut: true})
                               .onTap
                               .pipe(take(1))
                               .subscribe({
-                                    next: () => this.router.navigateByUrl('/members/' + username + '?tab=VideoCall')
+                                    next: () => this.router.navigateByUrl('/members/' + username + '?tab=VideoCall', { skipLocationChange: true })
                               })
                   })
-            });
-      }
-
-      getPeerId(recipientUsername: string) {
-            return this.hubConnection?.invoke('GetPeerId', recipientUsername)
-                  .catch(error => console.log(error));
       }
 
       callUser(recipientUsername: string){

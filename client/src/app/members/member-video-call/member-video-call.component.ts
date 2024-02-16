@@ -1,220 +1,154 @@
-import { Component, OnInit, ViewChild, ElementRef, Input, HostListener } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Input, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import Peer from 'peerjs';
-import { take } from 'rxjs';
+import { Subscription, take } from 'rxjs';
 import { Member } from 'src/app/_models/member';
+import { User } from 'src/app/_models/user';
+import { AccountService } from 'src/app/_services/account.service';
 import { PresenceService } from 'src/app/_services/presence.service';
-import { VideocallService } from 'src/app/_services/videocall.service';
 
 @Component({
       selector: 'app-member-video-call',
       templateUrl: './member-video-call.component.html',
-      styleUrls: ['./member-video-call.component.css']
+      styleUrls: ['./member-video-call.component.css'],
+      changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MemberVideoCallComponent implements OnInit {
-      @ViewChild('callerVideo') callerVideo!: ElementRef<HTMLVideoElement>;
+      @ViewChild('localVideo') localVideo!: ElementRef<HTMLVideoElement>;
       @ViewChild('remoteVideo') remoteVideo!: ElementRef<HTMLVideoElement>;
-      localStream: MediaStream | undefined;
-      private peer: Peer;
-      @Input()
-      peerIdShare: string[] = [];
-      peerId: string = '';
-      private lazyStream: any;
-      currentPeer: any;
-      private peerList: Array<any> = [];
-      @Input() username?: string;
-      loading = false;
-      public isOnline: boolean = false;
       member: Member = {} as Member;
-      connectMessage = 'User is Online';
-      notify = false;
+      peer: Peer | undefined  ;
+      user: User | null = null;
+      isOnline: boolean = false;
+      callBtnText: string;
 
+      constructor(private route: ActivatedRoute, 
+            private accountService: AccountService,
+            public presenceService: PresenceService,
+            private router: Router) {
+                  this.callBtnText = "Call";
+                  this.accountService.currentUser$.pipe(take(1)).subscribe({
+                        next: user => this.user = user
+                  });
+      }
 
-      constructor(private route: ActivatedRoute, private elementRef: ElementRef, private videoCallService: VideocallService, public presenceService: PresenceService, private router: Router) {
-            this.peer = this.presenceService.peer;
+      ngOnInit(): void {
+            this.route.data.pipe(take(1)).subscribe({
+                  next: data => {
+                        this.member = data['member'];
+                  }
+            });
+
             this.presenceService.onlineUsers$.pipe(take(1)).subscribe({
                   next: users => {
                         if (this.member.userName in users) {
                               this.isOnline = true;
-                              console.log(this.isOnline);
                         }
                   }
-            });
+            });   
 
-            console.log(this.isOnline);
-      }
-      ngOnDestroy() {
-            this.router.navigateByUrl('/members/' + this.username);
-      }
-      ngOnInit(): void {
-            //this.loadUserPeerId(); 
-            this.route.data.subscribe({
-                  next: data => this.member = data['member']
-            });
-
-
-            this.route.queryParams.subscribe({
+            this.route.queryParams.pipe(take(1)).subscribe({
                   next: params => {
-                        this.notify = true;
                         if (params['tab']) {
-                              console.log('helooooooooooo');
-                              this.callPeer(this.peerIdShare[0]);
-                              this.getPeerVideo();
-                              this.loadMyVideo();
-                              console.log('byeeeeeeeeeeee');
+                              this.callBtnText = "Accept Call";
                         }
                   }
             });
       }
 
-      //  @HostListener('window:beforeunload', ['$event'])
-      // beforeUnloadHandler(event: Event): string {
-      //   this.router.navigateByUrl('/members/' + this.username);
-      //   return 'Are you sure you want to leave?';
-      // }
-
-      getConnectionMessage(): string {
-            return this.isOnline ? 'Ringing' : 'User is offline';
+      ngOnDestroy() {
+            this.isOnline = false;
       }
 
-      public loadUserPeerId() {
-            if (this.username) {
-                  this.presenceService.getPeerId(this.username)?.then(peerIdList => {
-
-                        this.peerIdShare = peerIdList === undefined ? [] : peerIdList;
-                        console.log(peerIdList);
-                        if (this.peerIdShare.length === 0)
-                              this.isOnline = false;
-                        else
-                              this.isOnline = true;
-
-                        console.log(this.connectMessage);
-                  });
+      callButtonClicked(): void{
+            switch(this.callBtnText){
+                  case "Call":
+                        this.makeCall();
+                        break;
+                  case "Accept Call":
+                        this.acceptCall();
+                        break;
+                  case "End Call":
+                        this.endCall();
+                        break;
+                  default:
+                        break;
             }
-
       }
 
+      private makeCall(){
+            this.callBtnText = "Ringing";
+            this.peer = new Peer(this.member.userName);
+            console.log(this.member.userName);
 
+            this.presenceService.callUser(this.member.userName);
 
-      private getPeerVideo = () => {
-            //console.log('getPeerVideo CALLED OF MEMBER.VIDEO.CALL.COMPONENT')
-            this.peer.on('call', (call) => {
+            this.peer.on('open', (id) => {
+                  console.log("Peer Room ID: ", id)
                   navigator.mediaDevices.getUserMedia({
                         video: {
-                              frameRate: { ideal: 120 }, // Desired frame rate
-                              // Add other constraints if needed, such as facingMode, aspectRatio, etc.
-                        },
-                        audio: true
-                  }).then((stream) => {
-                        this.lazyStream = stream;
-
-                        call.answer(stream);
-                        call.on('stream', (remoteStream) => {
-                              if (!this.peerList.includes(call.peer)) {
-                                    this.streamRemoteVideo(remoteStream);
-                                    this.currentPeer = call.peerConnection;
-                                    this.peerList.push(call.peer);
-                              }
-                        });
-                        this.loading = false
-                  }).catch(err => {
-                        console.log(err + ' Unable to get media');
-                  });
-            });
-      }
-
-      connectWithPeer(): void {
-            if (this.username) {
-                  this.presenceService.callUser(this.username);
-            }
-
-
-            this.callPeer(this.peerIdShare[0]);
-            this.getPeerVideo();
-            this.loadMyVideo();
-      }
-
-      private callPeer(id: string): void {
-            navigator.mediaDevices.getUserMedia({
-                  video: {
-                        frameRate: { ideal: 120 },
-                  },
-                  audio: {
-                        echoCancellation: true,
-                        noiseSuppression: true
-                  }
-            }).then((stream) => {
-                  this.lazyStream = stream;
-
-                  const call = this.peer.call(id, stream);
-                  call.on('stream', (remoteStream) => {
-                        if (!this.peerList.includes(call.peer)) {
-                              this.streamRemoteVideo(remoteStream);
-                              this.currentPeer = call.peerConnection;
-                              this.peerList.push(call.peer);
-                        }
-                  });
-            }).catch(err => {
-                  console.log(err + ' Unable to connect');
-            });
-      }
-
-      private streamRemoteVideo(stream: any): void {
-            this.remoteVideo.nativeElement.srcObject = stream;
-      }
-
-      public async loadMyVideo(): Promise<void> {
-            try {
-                  this.localStream = await navigator.mediaDevices.getUserMedia({
-                        video: {
                               frameRate: { ideal: 120 },
+                              facingMode: 'user'
                         },
                         audio: {
                               echoCancellation: true,
                               noiseSuppression: true
                         }
-                  });
-                  if (this.localStream && this.callerVideo) {
-                        this.callerVideo.nativeElement.srcObject = this.localStream;
-                        this.callerVideo.nativeElement.onloadedmetadata = () => {
-                              this.callerVideo.nativeElement.play();
-                        };
-                  }
-            } catch (error) {
-                  console.error('Error accessing the camera: ', error);
-            }
+                  }).
+                  then((stream) => {
+                        this.streamLocalVideo(stream);
+                        this.callBtnText = "End Call";
+                        this.peer!.on('call', (call) => {
+                              call.answer(stream);
+                              call.on('stream', (stream) => {
+                                  console.log("got call");
+                                  console.log(stream);
+                                  this.streamRemoteVideo(stream);
+                              })
+                          })
+                        }, (err) => {
+                        console.log(err)
+                  })
+            })
+      }
+
+      private acceptCall(){
+            this.callBtnText = "Connecting"
+            this.peer = new Peer();
+            this.peer.on('open', (id) => {
+                  navigator.mediaDevices.getUserMedia({
+                        video: {
+                              frameRate: { ideal: 120 },
+                              facingMode: 'user'
+                        },
+                        audio: {
+                              echoCancellation: true,
+                              noiseSuppression: true
+                        }
+                  }).
+                  then((stream) => {
+                        this.streamLocalVideo(stream);
+                        this.callBtnText = "End Call";
+                        const call = this.peer!.call(this.user!.username, stream);
+                        call.on('stream', (stream) =>{
+                              this.streamRemoteVideo(stream);
+                        })
+                        }, (err) => {
+                        console.log(err)
+                  })
+            });
+      }
+
+      private endCall(){
+
       }
 
 
-      // screenShare(): void {
-      //       this.shareScreen();
-      // }
+      private streamRemoteVideo(stream: any): void {
+            this.remoteVideo.nativeElement.srcObject = stream;
+      }
 
-      // private shareScreen(): void {
-      //       navigator.mediaDevices.getDisplayMedia({
-      //             video: {
-      //                   frameRate: { ideal: 60 },
-      //             },
-      //             audio: {
-      //                   echoCancellation: true,
-      //                   noiseSuppression: true
-      //             }
-      //       }).then(stream => {
-      //             const videoTrack = stream.getVideoTracks()[0];
-      //             videoTrack.onended = () => {
-      //                   this.stopScreenShare();
-      //             };
-
-      //             const sender = this.currentPeer.getSenders().find((s: any) => s.track.kind === videoTrack.kind);
-      //             sender.replaceTrack(videoTrack);
-      //       }).catch(err => {
-      //             console.log('Unable to get display media ' + err);
-      //       });
-      // }
-
-      // private stopScreenShare(): void {
-      //       const videoTrack = this.lazyStream.getVideoTracks()[0];
-      //       const sender = this.currentPeer.getSenders().find((s: any) => s.track.kind === videoTrack.kind);
-      //       sender.replaceTrack(videoTrack);
-      // }
+      private streamLocalVideo(stream: any): void {
+            this.localVideo.nativeElement.srcObject = stream;
+      }
 }

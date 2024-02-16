@@ -1,29 +1,21 @@
 <div class="call-screen">
-      <span>PeerId: {{ isOnline }}</span>
-      <input type="text" placeholder="Peer Id" [(ngModel)]='peerIdShare' />
       <div class="video-screen">
             <div class="caller">
-                  <video #callerVideo autoplay></video>
+                  <video #localVideo autoplay></video>
             </div>
-            <div *ngIf="!loading" class="receiver" id="remote-video">
+            <div class="receiver">
                   <video #remoteVideo autoplay ></video>
-            </div>
-            <div *ngIf="loading" class="receiver">
-                  
-                        <h3>{{ getConnectionMessage() }}</h3>
-                 
             </div>
       </div>
       <div class="call-controls">
             <button class="btn btn-primary">
                   Mute/Unmute
             </button>
-            <button (click)="connectWithPeer()" class="btn btn-success">
-                  Make Call
+            <button [innerText]="callBtnText" 
+                    (click)="callButtonClicked()" 
+                    class="btn btn-success"
+                    [disabled]="(callBtnText === 'Ringing') || (callBtnText === 'Connecting')">
             </button>
-            <!-- <button *ngIf="!(presenceService.onlineUsers$ | async)?.includes(member.userName)" class="btn btn-success">
-                  User is Offline
-            </button> -->
             <button class="btn btn-primary">
                   Hide/Show
             </button>
