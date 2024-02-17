@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountService } from './_services/account.service';
 import { User } from './_models/user';
+import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -11,11 +13,14 @@ export class AppComponent implements OnInit{
   title = 'Dating App';
   users: any;
 
-  constructor(private accountService: AccountService){}
+  constructor(private accountService: AccountService,private router: Router){}
 
   ngOnInit(): void {
      
      this.setCurrentUser();
+     if(this.router.url === environment.baseUrl){
+      this.router.navigateByUrl('/members');
+     }
   }
 
  

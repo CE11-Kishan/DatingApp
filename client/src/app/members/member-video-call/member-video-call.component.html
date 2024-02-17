@@ -1,23 +1,27 @@
 <div class="call-screen">
       <div class="video-screen">
-            <div class="caller">
-                  <video #localVideo autoplay></video>
+            <div class="wrapper">
+                  <div class="caller" [ngClass]="{'add-blur' : localStream  === undefined}">
+                        <video #localVideo autoplay></video>
+                  </div>
             </div>
-            <div class="receiver">
-                  <video #remoteVideo autoplay ></video>
+            <div class="wrapper">
+                  <div class="receiver" [ngClass]="{'add-blur' : localStream  === undefined}">
+                        <video #remoteVideo autoplay ></video>
+                  </div>
             </div>
       </div>
       <div class="call-controls">
-            <button class="btn btn-primary">
-                  Mute/Unmute
-            </button>
-            <button [innerText]="callBtnText" 
+            <button [innerText]="callBtnText + ' ' + memberName" 
                     (click)="callButtonClicked()" 
-                    class="btn btn-success"
-                    [disabled]="(callBtnText === 'Ringing') || (callBtnText === 'Connecting')">
-            </button>
-            <button class="btn btn-primary">
-                  Hide/Show
+                    class="btn"
+                    [ngClass]="{
+                                    'btn-success': callBtnText === 'Call',
+                                    'btn-danger':  callBtnText === 'Connecting',
+                                    'btn-primary': callBtnText === 'End Call',
+                                    'btn-info': callBtnText === 'Accept Call'
+                              }"
+                    [disabled]="(callBtnText === 'Connecting')">
             </button>
       </div>
 </div>

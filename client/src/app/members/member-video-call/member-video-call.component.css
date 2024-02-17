@@ -9,15 +9,28 @@
       justify-content: space-evenly;
       margin-top: 10px;
 }
+ .call-controls > button {
+      width: 100%;
+ }
 
 .caller, .receiver {
+      background-size: cover;
+      width: 100%;
+      height: 100%;
+}
+
+.add-blur{
+      filter: blur(8px);
+}
+
+.wrapper{
       display: flex;
       flex: 1;
-      height: 100%;
-      width: 50%;
-      border: 2px solid black;
       justify-content: center;
       align-items: center;
+      width: 100%;
+      height: 100%;
+      border: 2px solid black;
 }
 
 video{
@@ -31,8 +44,11 @@ video{
             height: 90vh;
             flex-direction: column;
       }
+      .wrapper{
+            height: 50%;
+      }
       .caller, .receiver {
             width: 100%;
-            height: 50%;
+            height: 100%;
       }
 }

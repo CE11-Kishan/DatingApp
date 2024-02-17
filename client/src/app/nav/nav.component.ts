@@ -12,11 +12,16 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class NavComponent implements OnInit {
       model: any = {};
+      logoLink: string = "/";
+
 
 
       constructor(public accountServices: AccountService, private router: Router, private tostr: ToastrService) { }
 
       ngOnInit(): void {
+            if(localStorage.getItem('user')){
+                  this.logoLink = "/members";
+            }
       }
 
 

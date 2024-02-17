@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, Input, HostListener, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Input, HostListener, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import Peer from 'peerjs';
 import { Subscription, take } from 'rxjs';
@@ -21,11 +21,15 @@ export class MemberVideoCallComponent implements OnInit {
       user: User | null = null;
       isOnline: boolean = false;
       callBtnText: string;
+      mediaConnection: any;
+      localStream : MediaStream | undefined = undefined;
+      memberName: string = '';
 
       constructor(private route: ActivatedRoute, 
             private accountService: AccountService,
             public presenceService: PresenceService,
-            private router: Router) {
+            private elementRef: ElementRef,
+            private cdr: ChangeDetectorRef) {
                   this.callBtnText = "Call";
                   this.accountService.currentUser$.pipe(take(1)).subscribe({
                         next: user => this.user = user
@@ -51,9 +55,18 @@ export class MemberVideoCallComponent implements OnInit {
                   next: params => {
                         if (params['tab']) {
                               this.callBtnText = "Accept Call";
+                              this.scrollToBottom();
                         }
                   }
             });
+
+            if(this.callBtnText === 'Call'){
+                  this.memberName = this.member.knownAs;
+            }else{
+                  this.memberName = '';
+            }
+
+            this.loadCallBackgroundImage();
       }
 
       ngOnDestroy() {
@@ -77,7 +90,7 @@ export class MemberVideoCallComponent implements OnInit {
       }
 
       private makeCall(){
-            this.callBtnText = "Ringing";
+            this.callBtnText = "Connecting";
             this.peer = new Peer(this.member.userName);
             console.log(this.member.userName);
 
@@ -85,6 +98,7 @@ export class MemberVideoCallComponent implements OnInit {
 
             this.peer.on('open', (id) => {
                   console.log("Peer Room ID: ", id)
+                  this.callBtnText = "End Call";
                   navigator.mediaDevices.getUserMedia({
                         video: {
                               frameRate: { ideal: 120 },
@@ -96,15 +110,26 @@ export class MemberVideoCallComponent implements OnInit {
                         }
                   }).
                   then((stream) => {
+                        this.localStream = stream;
                         this.streamLocalVideo(stream);
-                        this.callBtnText = "End Call";
                         this.peer!.on('call', (call) => {
+                              this.mediaConnection = call;
                               call.answer(stream);
                               call.on('stream', (stream) => {
                                   console.log("got call");
                                   console.log(stream);
                                   this.streamRemoteVideo(stream);
-                              })
+                                  this.callBtnText = "End Call";
+                                  this.memberName = ' with ' + this.member.knownAs;
+                                  this.cdr.detectChanges();
+                              });
+                              call.on('close', () =>{
+                                    this.streamLocalVideo(null);
+                                    this.streamRemoteVideo(null);
+                                    this.callBtnText = "Call";
+                                    this.memberName = this.member.knownAs;
+                                    this.cdr.detectChanges();
+                              });
                           })
                         }, (err) => {
                         console.log(err)
@@ -116,6 +141,7 @@ export class MemberVideoCallComponent implements OnInit {
             this.callBtnText = "Connecting"
             this.peer = new Peer();
             this.peer.on('open', (id) => {
+                  
                   navigator.mediaDevices.getUserMedia({
                         video: {
                               frameRate: { ideal: 120 },
@@ -127,12 +153,22 @@ export class MemberVideoCallComponent implements OnInit {
                         }
                   }).
                   then((stream) => {
+                        this.localStream = stream;
                         this.streamLocalVideo(stream);
-                        this.callBtnText = "End Call";
-                        const call = this.peer!.call(this.user!.username, stream);
-                        call.on('stream', (stream) =>{
+                        this.mediaConnection = this.peer!.call(this.user!.username, stream);
+                        this.mediaConnection.on('stream', (stream: any) =>{
                               this.streamRemoteVideo(stream);
-                        })
+                              this.callBtnText = "End Call";
+                              this.memberName = ' with ' + this.member.knownAs;
+                              this.cdr.detectChanges();
+                        });
+                        this.mediaConnection.on('close', () =>{
+                              this.streamLocalVideo(null);
+                              this.streamRemoteVideo(null);
+                              this.callBtnText = "Call";
+                              this.memberName = this.member.knownAs;
+                              this.cdr.detectChanges();
+                        });
                         }, (err) => {
                         console.log(err)
                   })
@@ -140,15 +176,38 @@ export class MemberVideoCallComponent implements OnInit {
       }
 
       private endCall(){
-
+            this.mediaConnection.close();
       }
 
 
       private streamRemoteVideo(stream: any): void {
             this.remoteVideo.nativeElement.srcObject = stream;
+            this.cdr.detectChanges();
       }
-
+      
       private streamLocalVideo(stream: any): void {
             this.localVideo.nativeElement.srcObject = stream;
+            if (this.localStream && stream === null) {
+                  this.localStream.getTracks().forEach(track => track.stop());
+
+            }
+            this.cdr.detectChanges();
+      }
+
+      private loadCallBackgroundImage(): void{
+            const localVideoAreaElement = this.elementRef.nativeElement.querySelector('.caller');
+            localVideoAreaElement.style.backgroundImage = `url(${this.member.photoUrl})`;
+
+            const remoteVideoAreaElement = this.elementRef.nativeElement.querySelector('.receiver');
+            remoteVideoAreaElement.style.backgroundImage = `url(${this.user?.photoUrl})`;
+      }
+
+      private scrollToBottom(): void {
+            window.scrollTo({
+                  left: 0,
+                  top: document.body.scrollHeight,
+                  behavior: 'smooth'
+            });
+
       }
 }
