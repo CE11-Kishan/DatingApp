@@ -12,6 +12,7 @@
             atleast {{control.errors?.['minlength'].requiredLength}} characters</div>
       <div class="invalid-feedback" *ngIf="control.errors?.['maxlength']">{{label}} must be
             atmost {{control.errors?.['maxlength'].requiredLength}} characters</div>
+      <div class="invalid-feedback" *ngIf="control.errors?.['pattern']">Password must contain atleast one digit</div>
       <div class="invalid-feedback" *ngIf="control.errors?.['notMatching']">Please enter a
             Password do not match</div>
 </div>
